@@ -6,13 +6,18 @@
 #include <sys/stat.h>
 #include <fstream>
 #include <direct.h>
+#include <string>
 
 using namespace std;
-
+//=================Untuk Mudahin Loop===============
 #define fori(a, b) for(int i = (a); i < (b); i++)
 #define forj(a, b) for(int j = (a); j < (b); j++)
-#define fork(a, b) for(int k = (a); k < (b); k++)
-#define forl(a, b) for(int l = (a); l < (b); l++)
+#define forz(a, b) for(int z = (a); z < (b); z++)
+
+#define forLantai(a, b) for(int i = (a); i < (b); i++)
+#define forAP(a, b) for(int j = (a); j < (b); j++)
+#define forUserPerAP(a, b) for(int k = (a); k < (b); k++)
+#define forUserPerKegiatan(a, b) for(int l = (a); l < (b); l++)
 
 
 //======Penginnisialisasi Warna MEnggunakan Define Untuk Teks======
@@ -47,10 +52,11 @@ bool PunyaDatabase = true;
     const int MaxUser = 100;
     const int MaxLantai = 15;
     const int MaxAp_Per_lantai = 10;
-    int Lantai;
+    int Lantai, APMax = 0;
+    string pathFile1User, pathFile2User, pathFile3User;
 //=======================
 
-//======Function=====
+//======Function da prosedur=====
 void Navbar();
 void InterfaceAwal();
 void Login();
@@ -58,6 +64,20 @@ void SignUp();
 bool LoginProtection();
 bool SignProtect();
 void DirectP();
+
+void SimpanDataWifiUser();
+void SimpanDataKecepatanAP();
+void SimpaDataUserPerAP();
+
+void pauseScreen();
+
+
+double CovertStringToInterger(const string &text);
+double convertToGbpsANDMbps(const string& teks);
+
+///====Untuk Cloning Data Jadi Yang Diotakatik Buat Sort dan Search dari Sini====
+void CloningData();
+
 //=======Page========
 void PageAwal();
 void PageLoading();
@@ -65,6 +85,11 @@ void PageUtama();
 void NewPenggunna();
 void NewInputUnntukPenggunnaBaru();
 void cetakKategori();
+
+void cetakKonfigurasWifiUser();
+void ManuPagefirst(char &c, char &v);
+void CetakKecepatan(const char& type, const char &typeSort);
+void TampilkanKecepatanNormal();
 //===================
 
 //======Folder-PerUser=====
@@ -75,28 +100,258 @@ void WifikonfigurasiList();
 void KegiatanData();
 void CekSSemuaDataUser();
 
+
+///=====DataBase Ke Array=====
 void WifiConnfigureIN();
 void PenggunaIN();
 void APSpeedIN();
 void DataBaseUserIN();
+
+//====Array-Save-Data-Buat-User====
+int DataBaseUser[MaxLantai];
+string Pengguna[MaxLantai][MaxAp_Per_lantai][MaxUser][2]; //2 Buat Nama Pengguna dan Kegiatan yang dilakukan
+string APSpeed[MaxLantai][MaxAp_Per_lantai][2];
+string WifiConnfigur[MaxLantai][5]; //4 buat deklarasi Nama wifi, kecepatann wwifi, sama total penngguna
+string Kegiatan[5][2];
+string WifiCategoryList[10][5];
+
+// === Clone Arrays ===
+string ClonePengguna[MaxLantai][MaxAp_Per_lantai][MaxUser][2];
+string CloneAPSpeed[MaxLantai][MaxAp_Per_lantai][2];
+string CloneWifiConnfigur[MaxLantai][5];
+
+//=========Array-Searching======
+string findAP[MaxLantai][MaxAp_Per_lantai];
+
+///====================================================================================
+void WifiConnfigureIN() {
+    string pathfile = path + "/WifiConfigure.txt";
+    fstream file(pathfile, ios::in);
+    string line;
+
+    int indexLantai = 0;
+    int currentLantai = 0;
+    int jumlahAP = 0;
+    while (getline(file, line)) {
+        //=== PARSING JUMLAH LANTAI ===
+        if (line.find("Jumlah Lantai =") != string::npos) {
+            int result = 0;
+            bool out = true;
+            string s = line.substr(line.find('=') + 2);
+
+            fori(0, s.length()) {
+                switch (s[i]) {
+                    case '0': result = result * 10 + 0; break;
+                    case '1': result = result * 10 + 1; break;
+                    case '2': result = result * 10 + 2; break;
+                    case '3': result = result * 10 + 3; break;
+                    case '4': result = result * 10 + 4; break;
+                    case '5': result = result * 10 + 5; break;
+                    case '6': result = result * 10 + 6; break;
+                    case '7': result = result * 10 + 7; break;
+                    case '8': result = result * 10 + 8; break;
+                    case '9': result = result * 10 + 9; break;
+                    default: out = false; break;
+                }
+                if (!out) break;
+            }
+            if (out) {
+                Lantai = result;
+            }
+        }
+
+        //=== PARSING JUMLAH AP PER LANTAI ===
+        else if (line.find("> Lantai") != string::npos) {
+            bool out = true;
+            string s = line.substr(line.find('=') + 2);
+            jumlahAP = 0;
+            fori(0, s.length()) {
+                switch (s[i]) {
+                    case '0': jumlahAP = jumlahAP * 10 + 0; break;
+                    case '1': jumlahAP = jumlahAP * 10 + 1; break;
+                    case '2': jumlahAP = jumlahAP * 10 + 2; break;
+                    case '3': jumlahAP = jumlahAP * 10 + 3; break;
+                    case '4': jumlahAP = jumlahAP * 10 + 4; break;
+                    case '5': jumlahAP = jumlahAP * 10 + 5; break;
+                    case '6': jumlahAP = jumlahAP * 10 + 6; break;
+                    case '7': jumlahAP = jumlahAP * 10 + 7; break;
+                    case '8': jumlahAP = jumlahAP * 10 + 8; break;
+                    case '9': jumlahAP = jumlahAP * 10 + 9; break;
+                    default: out = false; break;
+                }
+                if (!out) break;
+            }
+
+            out = true;
+            if (out) {
+                DataBaseUser[indexLantai] = jumlahAP;
+                if (APMax < jumlahAP) APMax = jumlahAP;
+                indexLantai++;
+            }
+        }
+
+        //=== PARSING ISI WIFI SETIAP LANTAI ===
+        else if (line.find("MerekWiFi") != string::npos && currentLantai < MaxLantai) {
+            WifiConnfigur[currentLantai][0] = line.substr(line.find(':') + 2);
+        }
+        else if (line.find("AccessPoint") != string::npos && currentLantai < MaxLantai) {
+            WifiConnfigur[currentLantai][1] = line.substr(line.find(':') + 2);
+        }
+        else if (line.find("KecepatanWiFi") != string::npos && currentLantai < MaxLantai) {
+            WifiConnfigur[currentLantai][2] = line.substr(line.find(':') + 2);
+        }
+        else if (line.find("KecepatanAP") != string::npos && currentLantai < MaxLantai) {
+            WifiConnfigur[currentLantai][3] = line.substr(line.find(':') + 2);
+        }
+        else if (line.find("MaxUser      :") != string::npos && currentLantai < MaxLantai) {
+            WifiConnfigur[currentLantai][4] = line.substr(line.find(':') + 2);
+            currentLantai++; // baru naik setelah kecepatan AP diset
+        }
+
+        if (currentLantai >= MaxLantai) break;
+    }
+    file.close();
+}
+
+void APSpeedIN() {
+    fstream file(pathFile3User, ios::in);
+    string line;
+
+    int indexLantai = -1, indexAP = 0;
+    while (getline(file, line)) {
+        if (line.find(">> Lantai") != string::npos) {
+            indexLantai++;
+            indexAP = 0; // reset ke 0 setiap pindah lantai
+        }
+        else if (line.find("AccessPoint") != string::npos && line.find("=") != string::npos) {
+            // Ambil bagian antara '=' dan '||'
+            size_t eqPos = line.find('=');
+            size_t delimiterPos = line.find("||");
+
+            string apSpeed = line.substr(eqPos + 2, delimiterPos - (eqPos + 2));
+            APSpeed[indexLantai][indexAP][0] = apSpeed;
+
+            // Ambil bagian setelah "Kecepatan User ="
+            size_t userSpeedPos = line.find("Kecepatan User =");
+            if (userSpeedPos != string::npos) {
+                string userSpeed = line.substr(userSpeedPos + 17); // 17 panjang "Kecepatan User = "
+                APSpeed[indexLantai][indexAP][1] = userSpeed;
+            }
+
+            indexAP++;
+        }
+    }
+    file.close();
+}
+
+void PenggunaIN() {
+    fstream file(pathFile3User, ios::in);
+    string line;
+
+    int indexLantai = -1;
+    int indexAP = 0;
+    int indexUser = 0;
+
+    while (getline(file, line)) {
+        // Cek Lantai
+        if (line.find(">> Lantai") != string::npos) {
+            indexLantai++;
+            indexAP = 0;
+            continue;
+        }
+
+        // Cek Access Point
+        if (line.find("AccessPoint") != string::npos) {
+            indexUser = 0;
+            continue;
+        }
+
+        // Cek jika baris ada Nama dan Kegiatan
+        if (line.find("Nama =") != string::npos && line.find("Kegiatan =") != string::npos) {
+            // Cari posisi nama dan kegiatan
+            size_t namaPos = line.find("Nama =") + 7;
+            size_t kegiatanPos = line.find("Kegiatan =");
+
+            string nama = line.substr(namaPos, kegiatanPos - namaPos - 4); // -4 untuk ' || '
+            string kegiatan = line.substr(kegiatanPos + 11);
+
+            // Masukkan ke array
+            Pengguna[indexLantai][indexAP][indexUser][0] = nama;
+            Pengguna[indexLantai][indexAP][indexUser][1] = kegiatan;
+
+            indexUser++;
+        }
+
+        // Kalau baris kosong tapi sudah di dalam lantai dan AP, maka kita anggap AP berikutnya
+        if (line.find("AccessPoint") != string::npos) {
+            indexAP++;
+        }
+    }
+
+    file.close();
+}
+///=======================================================================================
 
 //====Set-Warnna====
 void setWarna(int kodeWarna) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), kodeWarna);
 }
 
-//====Array-Save-Data-Buat-User====
-int DataBaseUser[MaxLantai];
-string Pengguna[MaxLantai][MaxAp_Per_lantai][MaxUser][2]; //2 Buat Nama Pengguna dan Kegiatan yang dilakukan
-string APSpeed[MaxLantai][MaxAp_Per_lantai];
-string WifiConnfigur[MaxLantai][MaxAp_Per_lantai][3]; //3 buat deklarasi Nama wifi, kecepatann wwifi, sama total penngguna
-string Kegiatan[5][2];
-string WifiCategoryList[10][5];
+///========Cover dari strig ke int atau double======
+double stringToDoubleManual(const string& s) {
+    double result = 0.0;
+    double desimal = 0.0;
+    bool adaTitik = false;
+    double pembagiDesimal = 10.0;
 
+    for (int i = 0; i < s.length(); i++) {
+        char c = s[i];
+        if (c >= '0' && c <= '9') {
+            if (!adaTitik) {
+                result = result * 10 + (c - '0');
+            } else {
+                desimal += (c - '0') / pembagiDesimal;
+                pembagiDesimal *= 10;
+            }
+        } else if ((c == '.' || c == ',') && !adaTitik) {
+            adaTitik = true;
+        }
+    }
 
-//====Array-Searching===
-string findAP[MaxLantai][MaxAp_Per_lantai];
+    return result + desimal;
+}
 
+double convertToGbpsANDMbps(const string& teks, char typeConvert) {
+    double angka = stringToDoubleManual(teks);
+
+    string satuan = teks;
+    transform(satuan.begin(), satuan.end(), satuan.begin(), ::tolower);
+
+    // Normalize typeConvert (misalnya 'm' -> 'M')
+    typeConvert = toupper(typeConvert);
+
+    if (typeConvert == 'M') {  // Ke Mbps
+        if (satuan.find("gbps") != string::npos) {
+            return angka * 1000.0;
+        } else if (satuan.find("mbps") != string::npos) {
+            return angka;
+        } else if (satuan.find("kbps") != string::npos) {
+            return angka / 1000.0;
+        }
+    }
+    else if (typeConvert == 'G') {  // Ke Gbps
+        if (satuan.find("gbps") != string::npos) {
+            return angka;
+        } else if (satuan.find("mbps") != string::npos) {
+            return angka / 1000.0;
+        } else if (satuan.find("kbps") != string::npos) {
+            return angka / 1000000.0;
+        }
+    }
+
+    // Kalau satuan tidak dikenali
+    return angka;
+}
 
 //====Cek-Database-User====
 void reconDatabase(){
@@ -107,14 +362,15 @@ void reconDatabase(){
     }
     DataBase.close();
 }
-//========================
+//=========================
 
 void Navbar(){
+    system("cls");
     cout << "============================\n";
     cout << "|---"; setWarna(WARNA_HEADER); cout << "Wifi Analyze Company"; setWarna(WARNA_NORMAL); cout<< "---|\n";
     cout << "============================\n\n";
 }
-
+///===============================================================================
 //====Page Awal====
 void PageAwal(){
     system("cls");
@@ -154,10 +410,14 @@ void Login(){
         cout << "Username / Password salah harap ulangi! (" << maxTry <<" Kali percobaan Lagi) \n\n";
         setWarna(7);
     }
-    cout << "username: ";
+    cout << "Username: ";
+    setWarna(WARNA_HIJAU);
     cin >> UserName;
+    setWarna(WARNA_NORMAL);
     cout << "Password: ";
+    setWarna(WARNA_HIJAU);
     cin >> Password;
+    setWarna(WARNA_NORMAL);
     if(LoginProtection()){
         CekSSemuaDataUser();
         Attemp = true;
@@ -185,10 +445,6 @@ bool LoginProtection(){
     int sameboth = 0;
     bool same = false;
     while(getline(data, base)){
-        if(sameboth == 2){
-            same = true;
-            break;
-        }
 
         if(base.find("username ##") != string::npos){
             string usernameBase = base.substr(base.find("##") + 3);
@@ -202,6 +458,11 @@ bool LoginProtection(){
             }
         } else if(base.find("==============") != string::npos){
             sameboth = 0;
+        }
+
+        if(sameboth == 2){
+            same = true;
+            break;
         }
     }
     data.close();
@@ -221,7 +482,7 @@ void SignUp(){
         setWarna(3);
         cout <<"\nAkun Berhasil Dibuat!\n";
         setWarna(7);
-        cout <<"Harap Loginn Lagi Terlebih Dahulu";
+        cout <<"Harap Login Lagi Terlebih Dahulu";
         Sleep(1000);
         Login();
     } else{
@@ -259,18 +520,44 @@ bool SignProtect(){
 }
 
 //=======Page Loadig=======
-void PageLoading(){
-    fori(0, 3){
+void PageLoading() {
     system("cls");
-    cout << "Loading";
+    cout << "\nMemuat sistem WifiAnalyze...\n\n";
+    setWarna(WARNA_LOADING);
 
-        for(int i = 0; i < 3; i++){
-            cout << ".";
-            cout.flush();
-            Sleep(500);
-        }
+    string loadingBar = "===================="; // 20 karakter total
+    cout << "[                    ]"; // Bar kosong
+    cout.flush();
+
+    cout << "\r["; // Balik kursor ke depan
+    fori(0, 20) {
+        cout << loadingBar[i];
+        cout.flush();
+        Sleep(200); // Kecepatan pengisian bar
     }
+
+    cout << "] Selesai!\n";
+    setWarna(WARNA_NORMAL);
+    Sleep(700); // jeda sedikit sebelum lanjut
 }
+
+void PageLoading2() {
+    system("cls");
+    cout << "\nMemuat sistem WifiAnalyze...\n\n";
+    setWarna(WARNA_LOADING);
+
+    string spinner = "|/-\\";
+    for (int i = 0; i < 20; i++) {
+        cout << "\rLoading " << spinner[i % 4] << " ";
+        cout.flush();
+        Sleep(150);
+    }
+
+    setWarna(WARNA_NORMAL);
+    cout << "\nSelesai!\n";
+    Sleep(800);
+}
+
 
 //========CekDataUser=========
 // => Nama Folder ("UserData(#username)")
@@ -310,9 +597,12 @@ void cekbase(){
             }
         FileData.close();
     }
+    pathFile1User = path + "/WifiConfigure.txt";
+    pathFile2User = path + "/Wifi-User.txt";
+    pathFile3User = path + "/Wifi-Ap-Speed.txt";
 }
 
-void KegiatanData(){
+void KegiatanData(){ //-> Ke Array Kategori Kegiatan
     fstream file("DaftarKegiatan.txt", ios::in);
     string base;
     int i = 0;
@@ -327,7 +617,7 @@ void KegiatanData(){
     }
 }
 
-void WifikonfigurasiList(){
+void WifikonfigurasiList(){ //->Ke Array Kategori Wifi
     fstream file("WifiCategory.txt", ios::in);
     string base;
     int i = 0;
@@ -364,51 +654,142 @@ void CekDatabaseUser(){
 
 }
 
-void CekSSemuaDataUser(){
-    dataUser();
-    cekbase();
-    CekDatabaseUser();
-    KegiatanData();
-
-    //====Buat-Masukin Data Ke array===
-    if(PunyaDatabase){
-        //WifiConnfigureIN();
-        //PenggunaIN();
-        //APSpeedIN();
-        //DataBaseUserIN();
-    }
-}
-
-
-//========Page Utama==========
+///========Page Utama==========
 void PageUtama(){
     NewPenggunna();
     system("cls");
 
     Navbar();
+    cin.ignore();
     cout << "Pilihan Menu Yang Tersedia: \n";
     cout << "1. Cek Kecepatan Accses Point di setiap Lantai. \n";
-    cout << "2. Cek Nama wifi dan Penggunanya. \n";
-    cout << "3. Tambah Kondisi (lantai/ganti Wifi). \n";
+    cout << "2. Cek Konfigurasi Wifi Di Setiap lantai. \n";
+    cout << "3. Cek Nama wifi dan Penggunanya. \n";
+    cout << "4. Tambah Kondisi (lantai/ganti Wifi dll). \n";
+    cout << "5. Search (Cari). \n";
+    cout << "6. Logout. \n";
     cout << "Menu yang Dipilih: "; char pilih; cin >> pilih;
 
     switch(pilih){
     case '1':
+        char key, sortType;
+        ManuPagefirst(key, sortType);
 
         break;
     case '2':
-
+        cetakKonfigurasWifiUser();
         break;
     case '3':
 
         break;
-    default:
+    case '4':
 
         break;
+    case '5':
+
+        break;
+    case '6':
+        cout << endl;
+        UserName = "";
+        Password = "";
+        Sleep(800);
+        cout << "Anda Telah Logout!";
+        Sleep(700);
+        PageAwal();
+        break;
+    default:
+        cout << "Menu Belum Tersedia! Harap pilih denngan Benar!\n";
+        Sleep(900); PageUtama();
+        break;
     }
+
+    PageUtama();
 }
 
+//===============Menu 1=================
+void ManuPagefirst(char &c, char &v){
+    Navbar();
+    cin.ignore();
+    cout << "Menu Pilihan Tambahan: \n";
+    cout << "1. Cek Kecepatan normal. \n";
+    cout << "2. Cek Sesuai Urutam kecepatan per-Lantai. \n";
+    cout << "3. Cek Sesuai Urutan Kecepatan Per-ruangan. \n";
+    cout << "Pilih: "; char pilih; cin >> pilih;
+    switch(pilih){
+        case '1':
+        c = '1';
+        CetakKecepatan(c, v);
+        break;
+
+        case '2':
+        c = '2';
+        setWarna(WARNA_CYAN);
+        cout << endl;
+        cout << "Urutkan Secara Asceding atau Descending (A/D): "; cin >> pilih; v = pilih;
+        setWarna(WARNA_NORMAL);
+        break;
+
+        case '3':
+        setWarna(WARNA_CYAN);
+        cout << endl;
+        cout << "Urutkan Secara Asceding atau Descending (A/D): "; cin >> pilih; v = pilih;
+        setWarna(WARNA_NORMAL);
+        c = '3';
+        break;
+
+        default:
+            cout << "Pilihan Tidak Tersedia harap pilih kembali! \n";
+            Sleep(600);
+            ManuPagefirst(c, v);
+        break;
+    }
+    return;
+}
+
+void CetakKecepatan(const char& type, const char &typeSort){
+
+    if (!PunyaDatabase) {
+        setWarna(WARNA_ERROR);
+        cout << "Oops! Database belum diatur atau dimuat!\n";
+        cout << "Silakan atur konfigurasi awal di menu 'Tambah Kondisi' terlebih dahulu.\n";
+        setWarna(WARNA_NORMAL);
+        pauseScreen();
+        return;
+    }
+
+    switch(type){
+        case '1':
+            TampilkanKecepatanNormal();
+            break;
+        case '2':
+
+            break;
+        case '3':
+
+            break;
+        default:
+
+            break;
+        }
+
+}
+
+void TampilkanKecepatanNormal() {
+    setWarna(WARNA_HEADER);
+    cout << "===== KECEPATAN ACCESS POINT (NORMAL) =====" << endl;
+    setWarna(WARNA_NORMAL);
+
+
+}
+
+
+//===============cetak==================
 void cetakKategori(){
+    if (WifiCategoryList[0][0].empty()) {
+    cout << "Belum ada data kategori WiFi. Tambahkan di WifiCategory.txt\n";
+    return;
+    }
+    cout << "============================================\n";
        fori(0, 10){
             cout << "Wifi Kategory ke-" << i+1 << ": \n";
             cout << "MerekWiFi : " << WifiCategoryList[i][0] << endl;
@@ -419,9 +800,11 @@ void cetakKategori(){
             cout << "============================================\n";
             cout << endl;
     }
+    cout << "============================================\n";
     cout << endl;
 }
 
+///=========Page-New-User====================
 void NewPenggunna(){
     if(!PunyaDatabase){
         system("cls");
@@ -474,34 +857,184 @@ void NewInputUnntukPenggunnaBaru(){
             Sleep(500);}
         }while (pilih < 0 || pilih >= MaxCategori);
 
-    }
-    system("Pause");
+        //Masukinn Ke Array WifiConnfigur
+        WifiConnfigur[i][0] = WifiCategoryList[pilih][0]; //MerekWifi
+        WifiConnfigur[i][1] = WifiCategoryList[pilih][1]; //MerekAP
+        WifiConnfigur[i][2] = WifiCategoryList[pilih][2]; //KEcepatanWifi
+        WifiConnfigur[i][3] = WifiCategoryList[pilih][3]; //KecepatanAp
+        WifiConnfigur[i][4] = WifiCategoryList[pilih][4]; //MaxUser
 
+        //Masukinn Ke Array ApSpeed
+        forAP(0, DataBaseUser[i]){
+            APSpeed[i][j][0] = WifiCategoryList[pilih][3];
+            APSpeed[i][j][1] = "None";
+
+            forUserPerAP(0, 1){
+                Pengguna[i][j][k][0] = "NoneUdifiyedName";
+                Pengguna[i][j][k][1] = " ";
+            }
+        }
+
+    }
+    SimpanDataWifiUser();SimpanDataKecepatanAP(); SimpaDataUserPerAP();
+    system("Pause");
+}
+
+void SimpanDataWifiUser() { //Nulis Ulang makannya nanti bakal ke reset data nya
+    ofstream file(pathFile1User);
+
+    file << "################################" << endl;
+    file << "Jumlah Lantai = " << Lantai << endl;
+    fori(0, Lantai) {
+        file << "> Lantai " << i + 1 << " = " << DataBaseUser[i] << endl;
+    }
+    file << "################################" << endl << endl;
+
+    fori(0, Lantai) {
+        file << "================================" << endl;
+        file << "Lantai " << i + 1 << ":" << endl;
+        file << "MerekWiFi    : " << WifiConnfigur[i][0] << endl;
+        file << "AccessPoint  : " << WifiConnfigur[i][1] << endl;
+        file << "KecepatanWiFi: " << WifiConnfigur[i][2] << endl;
+        file << "KecepatanAP  : " << WifiConnfigur[i][3] << endl;
+        file << "MaxUser      : " << WifiConnfigur[i][4] << endl;
+        file << "================================" << endl << endl;
+    }
+
+    file.close();
+}
+
+void SimpanDataKecepatanAP(){
+    ofstream file(pathFile3User);
+
+    file << "=================================" << endl;
+    file << "Total Lantai = " << Lantai << endl;
+    file << "=================================" << endl << endl;
+
+    forLantai(0, Lantai){
+        file << ">> Lantai " << i + 1 << " = " << DataBaseUser[i] << endl;
+        forAP(0, DataBaseUser[i]){
+            file << setw(10) << " " << "AccessPoint = " << APSpeed[i][j][0] << " || " << "Kecepatan User = " << APSpeed[i][j][1] << endl;
+        }
+        file << endl << endl;
+    }
+    file << "=================================" << endl << endl;
+    file.close();
+}
+
+void SimpaDataUserPerAP() {
+    ofstream file(pathFile2User);
+    file << "=================================" << endl;
+    file << "Total Lantai = " << Lantai << endl;
+    file << "=================================" << endl << endl;
+
+    forLantai(0, Lantai) {
+        file << ">> Lantai " << i + 1 << " = " << DataBaseUser[i] << endl;
+        forAP(0, DataBaseUser[i]) {
+            int maxUser = stoi(WifiConnfigur[i][4]);
+            file << setw(10) << " " << "AccessPoint = " << j + 1 << endl;
+
+            // Cek apakah user pertama tidak valid
+            if (Pengguna[i][j][0][0] == "NoneUdifiyedName" || Pengguna[i][j][0][0] == "-") {
+                file << setw(15) << " " << "[None]" << endl << endl;
+                continue; // Langsung lanjut ke AP berikutnya
+            }
+
+            forUserPerAP(0, maxUser) {
+                if (Pengguna[i][j][k][0] == "-") continue; // Skip jika kosong
+                file << setw(15) << " " << "User Ke-" << k + 1 << endl;
+                file << setw(15) << " " << "Nama: " << Pengguna[i][j][k][0];
+                file << " || Kegiatan: " << Pengguna[i][j][k][1] << endl;
+                file << endl;
+            }
+            file << endl;
+        }
+        file << endl << endl;
+    }
+
+    file << "=================================" << endl << endl;
+    file.close();
 }
 
 
+//=======Page Pilihan Dari Menu Utama========
+void cetakKonfigurasWifiUser() {
+    system("cls"); // Typo kamu tulis 'sytem'
+    Navbar();
 
+    fori(0, Lantai) {
+        cout << "===========================\n";
+        setWarna(WARNA_LOADING);
+        cout << "Konfigurasi WiFi - Lantai " << i + 1 << endl;
+        setWarna(WARNA_NORMAL);
+        cout << "===========================\n";
+        cout << "Merek WiFi     : " << WifiConnfigur[i][0] << endl;
+        cout << "Access Point   : " << WifiConnfigur[i][1] << endl;
+        cout << "Kecepatan WiFi : " << WifiConnfigur[i][2] << endl;
+        cout << "Kecepatan AP   : " << WifiConnfigur[i][3] << endl;
+        cout << "MAX User       : " << WifiConnfigur[i][4] << endl;
+        cout << endl;
+    }
+
+    pauseScreen();
+    PageUtama();
+}
+
+//=======Page
+
+
+//==========Tambahan===========
+void init() {
+    reconDatabase();
+    KegiatanData();
+    WifikonfigurasiList();
+}
+
+void CekSSemuaDataUser(){
+    dataUser();
+    cekbase();
+    CekDatabaseUser();
+    KegiatanData();
+
+    //====Buat-Masukin Data Ke array===
+    if(PunyaDatabase){
+        WifiConnfigureIN();
+        PenggunaIN();
+        APSpeedIN();
+        //DataBaseUserIN();
+        CloningData();
+    }
+
+}
+
+void pauseScreen() {
+    cout << "Tekan tombol untuk kembali..."; getch();
+}
+
+///============Cloing===========
+void CloningData(){
+    forLantai(0, Lantai){
+        int maxUser = stoi(WifiConnfigur[i][4]);
+        forAP(0, DataBaseUser[i]){
+            //UtukKonnfigurasi Wifi setiap lantai
+            forz(0, 5){CloneWifiConnfigur[i][z] = WifiConnfigur[i][z];}
+            forUserPerAP(0, maxUser){
+                //Utuk speedAP
+                CloneAPSpeed[i][j][0] = APSpeed[i][j][0];
+                CloneAPSpeed[i][j][1] = APSpeed[i][j][1];
+                //====Untuk User yanng terkonnekasi
+                ClonePengguna[i][j][k][0] = Pengguna [i][j][k][0];
+                ClonePengguna[i][j][k][1] = Pengguna [i][j][k][1];
+            }
+        }
+    }
+}
 
 
 int main(){
-    reconDatabase();KegiatanData();WifikonfigurasiList();
+    init();
 
     PageAwal();
-
-    //char p[6] = "Hello";
-    //mkdir(p);
-
-
-    //string dir = "Hello";
-    //string cs = dir + "/test.txt";
-    //fstream Data(cs, ios::in);
-    //string base;
-    //while(getline(Data, base)){
-      //cout << base;
-    //}
-    //Data.close();
-    //const char* poi = "Halloo0o0";
-    //mkdir(poi);
 
     return 0;
 }

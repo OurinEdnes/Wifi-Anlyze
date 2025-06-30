@@ -1,0 +1,34 @@
+################################
+Jumlah Lantai = 3
+Lantai 1 = 3
+Lantai 2 = 4
+Lantai 3 = 5
+################################
+
+================================
+Lantai 1:
+MerekWiFi    : D-Link Business
+AccessPoint  : D-Link DAP-X2810
+KecepatanWiFi: 3.2 Gbps
+KecepatanAP  : 1.6 Gbps
+MaxUser      : 3
+================================
+
+================================
+Lantai 2:
+MerekWiFi    : ASUS Pro Business
+AccessPoint  : ASUS RT-AX88U
+KecepatanWiFi: 3.0 Gbps
+KecepatanAP  : 1.8 Gbps
+MaxUser      : 4
+================================
+
+================================
+Lantai 3:
+MerekWiFi    : Aruba Enterprise
+AccessPoint  : Aruba AP-515
+KecepatanWiFi: 4.0 Gbps
+KecepatanAP  : 2.3 Gbps
+MaxUser      : 5
+================================
+

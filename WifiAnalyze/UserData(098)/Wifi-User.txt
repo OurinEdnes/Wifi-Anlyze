@@ -1,0 +1,60 @@
+=================================
+Total Lantai = 3
+=================================
+
+>> Lantai 1 = 5
+          AccessPoint = 1
+               [None]
+
+          AccessPoint = 2
+               [None]
+
+          AccessPoint = 3
+               [None]
+
+          AccessPoint = 4
+               [None]
+
+          AccessPoint = 5
+               [None]
+
+
+
+>> Lantai 2 = 3
+          AccessPoint = 1
+               [None]
+
+          AccessPoint = 2
+               [None]
+
+          AccessPoint = 3
+               [None]
+
+
+
+>> Lantai 3 = 7
+          AccessPoint = 1
+               [None]
+
+          AccessPoint = 2
+               [None]
+
+          AccessPoint = 3
+               [None]
+
+          AccessPoint = 4
+               [None]
+
+          AccessPoint = 5
+               [None]
+
+          AccessPoint = 6
+               [None]
+
+          AccessPoint = 7
+               [None]
+
+
+
+=================================
+

@@ -1,26 +1,45 @@
-Lantai 1
-  AP Ke-1
-    Maksimal User: 5
-      - Nama     : Aikoo
-        Kegiatan : Browsing
+========================================
+>> Lantai 1
+AccessPoint 1
+   User 1: Nama = Banu || Kegiatan = Streaming
+   User 2: Nama = Aikoo || Kegiatan = Coding
+   User 3: Nama = Zeta || Kegiatan = Download
 
-      - Nama     : Banu
-        Kegiatan : Streaming
+AccessPoint 2
+   User 1: Nama = Hana || Kegiatan = Browsing
 
-  AP Ke-2
-    Maksimal User: 4
-      - Nama     : Lala
-        Kegiatan : Meeting
+AccessPoint 3
+   User 1: Nama = Reza || Kegiatan = Upload
+   User 2: Nama = Yuki || Kegiatan = Zoom
 
-      - Nama     : Tama
-        Kegiatan : Gaming
+AccessPoint 4
+   [EMPTY]
 
-====================================================
-Lantai 2
-  AP Ke-1
-    Maksimal User: 6
-      - Nama     : Fajar
-        Kegiatan : Download
+>> Lantai 2
+AccessPoint 1
+   User 1: Nama = Elin || Kegiatan = Gaming
+   User 2: Nama = Albert || Kegiatan = Discord
 
-      - Nama     : Rina
-        Kegiatan : Online Class
+AccessPoint 2
+   [EMPTY]
+
+AccessPoint 3
+   User 1: Nama = Sheila || Kegiatan = Telegram
+
+>> Lantai 3
+AccessPoint 1
+   User 1: Nama = Brian || Kegiatan = Email
+   User 2: Nama = Vira || Kegiatan = Coding
+
+AccessPoint 2
+   User 1: Nama = Ikhsan || Kegiatan = Streaming
+
+AccessPoint 3
+   [EMPTY]
+AccessPoint 4
+   [EMPTY]
+AccessPoint 5
+   [EMPTY]
+AccessPoint 6
+   User 1: Nama = Naura || Kegiatan = Upload
+========================================
