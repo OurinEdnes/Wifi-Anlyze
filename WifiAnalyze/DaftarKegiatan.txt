@@ -1,25 +1,25 @@
 Kegiatan = 1
     Nama       = Kerja
-    Kecepatan  = 50 Mbps
+    Kecepatan  = 100 Mbps
 
 ================================
 Kegiatan = 2
     Nama       = Streaming
-    Kecepatan  = 25 Mbps
+    Kecepatan  = 150 Mbps
 
 ================================
 Kegiatan = 3
     Nama       = Gaming
-    Kecepatan  = 35 Mbps
+    Kecepatan  = 125 Mbps
 
 ================================
 Kegiatan = 4
     Nama       = Browsing
-    Kecepatan  = 10 Mbps
+    Kecepatan  = 80 Mbps
 
 ================================
 Kegiatan = 5
     Nama       = Meeting Online
-    Kecepatan  = 20 Mbps
+    Kecepatan  = 180 Mbps
 
 ================================
