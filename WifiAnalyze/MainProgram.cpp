@@ -101,6 +101,7 @@ void TampilkanNama(); void tampilNormal(); void TampilUrut(); void UrutSesuaiKat
 
 void gantiAtauTambah(); void ChangeConnfigure(); void AddUser(); void RemoveUser(); void RemoveUserperLantai();
 void Searching(); void CariNama(); void cariBerdasarkanKegiatan();
+void konfigurasiKecepatanDenganUser();
 //===================
 
 //======Folder-PerUser=====
@@ -124,14 +125,14 @@ int DataBaseUser[MaxLantai];
 string Pengguna[MaxLantai][MaxAp_Per_lantai][MaxUser][2]; //2 Buat Nama Pengguna dan Kegiatan yang dilakukan
 string APSpeed[MaxLantai][MaxAp_Per_lantai][2];
 string WifiConnfigur[MaxLantai][5]; //4 buat deklarasi Nama wifi, kecepatann wwifi, sama total penngguna
-string Kegiatan[5][2];
+string Kegiatan[20][2];
 string WifiCategoryList[10][5];
 
 // === Clone Arrays ===
 string ClonePengguna[MaxLantai][MaxAp_Per_lantai][MaxUser][2];
 string CloneAPSpeed[MaxLantai][MaxAp_Per_lantai][2];
 string CloneWifiConnfigur[MaxLantai][5];
-string CloneKegiatan[5][2];
+string CloneKegiatan[20][2];
 
 //=========Array-Searching======
 string findAP[MaxLantai][MaxAp_Per_lantai];
@@ -362,10 +363,9 @@ int stringToIntManual(const string& s) {
     bool negatif = false;
     int i = 0;
 
-    // Cek tanda negatif di awal
     if (s[0] == '-') {
         negatif = true;
-        i = 1; // mulai dari karakter berikutnya
+        i = 1;
     }
 
     for (; i < s.length(); i++) {
@@ -373,7 +373,7 @@ int stringToIntManual(const string& s) {
         if (c >= '0' && c <= '9') {
             result = result * 10 + (c - '0');
         } else {
-            break; // hentikan jika ada karakter non-digit
+            break;
         }
     }
 
@@ -387,7 +387,6 @@ double convertToGbpsANDMbps(const string& teks, char typeConvert) {
     string satuan = teks;
     transform(satuan.begin(), satuan.end(), satuan.begin(), ::tolower);
 
-    // Normalize typeConvert (misalnya 'm' -> 'M')
     typeConvert = toupper(typeConvert);
 
     if (typeConvert == 'M') {  // Ke Mbps
@@ -413,7 +412,36 @@ double convertToGbpsANDMbps(const string& teks, char typeConvert) {
     return angka;
 }
 
+///========Konfiguruasi Koneksi Anntara SpeedAP ke USER======
+void konfigurasiKecepatanDenganUser(){
+    int maxKatalog = sizeof(Kegiatan) / sizeof(Kegiatan[0]);
+    forLantai(0, Lantai){
+        forAP(0, DataBaseUser[i]){
+            int maxUser = stringToIntManual(WifiConnfigur[i][4]);
+            double apspeedTemp = 0;
+            forUserPerAP(0, maxUser){
+                if(Pengguna[i][j][k][0] == "-"){
+                    continue;
+                }else{
+                forz(0, maxKatalog){
+                    if (Kegiatan[z][0] == Pengguna[i][j][k][1]) {
+                        string s = Kegiatan[z][1];
+                        double connverter = convertToGbpsANDMbps(s, 'G');
+                        apspeedTemp += connverter;
+                    }
+                }
+                }
+            }
+            if(apspeedTemp == 0){
+            APSpeed[i][j][1] = "[None]";
+            }else{
 
+            APSpeed[i][j][1] = to_string(apspeedTemp) + "Gbps";
+            }
+
+        }
+    }
+}
 
 //====Cek-Database-User====
 void reconDatabase(){
@@ -584,9 +612,14 @@ bool SignProtect(){
 //==========Katagero=========
 void cetakKatalog(){
     cout << endl;
-    fori(0, 5){
+    int maxKatalog = sizeof(Kegiatan) / sizeof(Kegiatan[0]);
+    fori(0, maxKatalog){
+        int range = Kegiatan[i][0].length();
+        if(Kegiatan[i][0] == "" || Kegiatan[i][0] == " " || Kegiatan[i][0] == "-") continue;
         cout << "Kegiatan " << i+1 << ": " << endl;
-        cout << "Jenis: " << setw(10) <<Kegiatan[i][0] << " || Kecepata yang dipakai: " << Kegiatan[i][1] <<endl<< endl;
+        cout << left << setw(5) << "Jenis: "; warnaText(Kegiatan[i][0], WARNA_BIRU);
+        cout << left << setw(17-range) <<" "<< " || ";
+        cout << left << setw(5) << "Kecepatan yang dipakai: "; warnaText(Kegiatan[i][1], WARNA_KUNING); cout << endl;
     }
     cout << endl;
 }
@@ -865,11 +898,13 @@ void TampilkanKecepatanNormal() {
             if(APS - SAU >= 500) setWarna(WARNA_HIJAU);
             if(APS - SAU < 500) setWarna(WARNA_ORANGE);
             if(APS - SAU < 200) setWarna(WARNA_MERAH);
+            if(APSpeed[i][j][0] == "" || APSpeed[i][j][0] == " " || APSpeed[i][j][0] == "-") continue;
             cout << "Kecepata AP ke-"<< j+1 << ": " << APSpeed[i][j][0] << " || Kecepata Totol User : " << APSpeed[i][j][1] << endl;
 
 
             setWarna(WARNA_NORMAL);
         }
+        setWarna(WARNA_NORMAL);
         cout << "===========================\n";
     }
 
@@ -913,11 +948,13 @@ void TampilkanKecepatanSortPerAP(const char &c){
             if(APS - SAU >= 500) setWarna(WARNA_HIJAU);
             if(APS - SAU < 500) setWarna(WARNA_ORANGE);
             if(APS - SAU < 200) setWarna(WARNA_MERAH);
+            if(CloneAPSpeed[i][j][0] == "" || CloneAPSpeed[i][j][0] == " " || CloneAPSpeed[i][j][0] == "-") continue;
             cout << "Kecepata AP ke-"<< j+1 << ": " << CloneAPSpeed[i][j][0] << " || Kecepata Totol User : " << CloneAPSpeed[i][j][1] << endl;
 
 
             setWarna(WARNA_NORMAL);
         }
+        setWarna(WARNA_NORMAL);
         cout << "===========================\n";
     }
 
@@ -1245,16 +1282,18 @@ void cariBerdasarkanKegiatan(){
 
     cetakKatalog();
     setWarna(WARNA_UNGU);
-    cout << "Masukan Nama "; warnaText("(HARUS SESUAI!)", WARNA_KUNING); cout << " : ";
+    cout << "Masukan Nama Kegiatan"; warnaText("(HARUS SESUAI!)", WARNA_KUNING); cout << " : ";
     string ket; cin >> ket;
     setWarna(WARNA_NORMAL);
+    bool ada = false;
     forLantai(0, Lantai){
         bool lanntaipass = true;
         forAP(0, DataBaseUser[i]){
         int range = stringToIntManual(WifiConnfigur[i][4]);
-        bool pass = true;
+        bool pass = false;
             forUserPerAP(0, range){
-                if(Pengguna[i][j][k][0] == ket){
+                if(Pengguna[i][j][k][1] == ket){
+                    ada = true;
                     if(lanntaipass){
                         cout << "Lantai " << i+1 << ": \n";
                         lanntaipass = false;
@@ -1270,6 +1309,10 @@ void cariBerdasarkanKegiatan(){
     }
 
     cout << endl;
+    if(!ada){
+        warnaText("Tidak Ada nama Kegiatan tersebut!\n", WARNA_CYAN);
+    }
+
     pauseScreen();
 }
 
@@ -1399,7 +1442,7 @@ void AddUser(){
     string user;
     int keyGit;
     bool ulang = true;
-
+    int maxKatalog = sizeof(Kegiatan) / sizeof(Kegiatan[0]);
     cout << endl;
     TampilUrut();
     cout << endl;
@@ -1433,7 +1476,7 @@ void AddUser(){
             cout << "Masukan Nomor Kegiatannya: ";
             cin >> keyGit;
             ulang = false;
-        } while (keyGit < 1 || keyGit > 5);
+        } while (keyGit < 1 || keyGit > maxKatalog);
 
         int range = stringToIntManual(WifiConnfigur[keyLantai - 1][4]);
         forUserPerAP(0, range) {
@@ -1762,6 +1805,7 @@ void CekSSemuaDataUser(){
 
         //Cloning Data
         CloningData();
+        konfigurasiKecepatanDenganUser();
     }
 
 }
